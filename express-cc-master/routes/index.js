@@ -13,14 +13,11 @@ const picker = datepicker(selector, options);*/
 sqlite.connect(__dirname + '/../db/meetings.db');
 /* GET home page. */
 router.get('/', function (req, res) {
-    console.log(req.user);
-    console.log(req.isAuthenticated());
     res.render('Homepage', {title: 'Homepage'});
 });
 
 /* GET dashboard page. */
 router.get('/dashboard', authenticationMiddleware(), function (req,res) {
-    console.log('Got dashboard');
     res.render('dashboard', {title: 'Dashboard'});
 });
 
@@ -36,6 +33,64 @@ router.get('/logout', function (req, res, next) {
     req.logout();
     req.session.destroy();
     res.redirect('/');
+});
+
+
+/* POST meeting details */
+router.post('/createMeeting', function (req, res, next) {
+    if (!req.body.password)
+    {
+        var pass = "";
+    } else
+    {
+        var pass = req.body.password;
+    }
+    var cmd = "INSERT INTO MeetingInfo (title, description, location, adminUsername, locked, password, numOfDates) VALUES ('"+ req.body.title +"', '"+ req.body.description +"', '"+ req.body.location +"', '"+ req.session.passport.user.user_id +"', '"+ req.body.locked +"', '"+ pass +"', 0);";
+    console.log(cmd);
+    sqlite.run(cmd, function (results) {
+        console.log(JSON.stringify(results));
+        if (results.error)
+        {
+            console.log("Error:");
+            console.log(JSON.stringify(results.error));
+            res.status(400).end(results.error);
+        } else {
+            console.log("No error");
+            res.status(200).end(results);
+        }
+    });
+});
+
+router.post('/addMeetingDates', function (req, res, next) {
+    console.log("Updating meeting");
+    var id = req.body.id;
+    var cmd;
+    req.body.options.forEach(function (option) {
+       cmd = "INSERT INTO MeetingDates (meetingid, date, lowerboundLimit, upperboundLimit, length) VALUES ('"+ id +"', '"+ option.date +"', '"+ option.start_time +"', '"+ option.end_time +"', '"+ option.length +"');";
+        console.log(cmd);
+        sqlite.run(cmd, function (results) {
+            console.log(JSON.stringify(results));
+            if (results.error)
+            {
+                console.log("Error:");
+                console.log(JSON.stringify(results.error));
+                res.status(400).end(results.error);
+            }
+        });
+    });
+    var url = parseInt(Math.random().toString().split('.')[1]).toString(26);
+    cmd = "INSERT INTO urls VALUES('"+id+"','"+url+"');";
+    qlite.run(cmd, function (results) {
+        console.log(JSON.stringify(results));
+        if (results.error)
+        {
+            console.log("Error:");
+            console.log(JSON.stringify(results.error));
+            res.status(400).end(results.error);
+        } else {
+            res.status(200).end(url);
+        }
+    });
 });
 
 /* GET Register page. */
@@ -73,13 +128,11 @@ router.post('/register', function (req, res, next) {
 
         bcrypt.hash(password, saltRounds, function (err, hash) {
             sqlite.run("INSERT INTO users (username, email, password) VALUES ('"+username+"', '"+ email +"', '"+hash+"')", function (results){
-                if (results.error) throw res.error;
-                sqlite.run('SELECT LAST_INSERT_ID() as user_id', function (res) {
-                    if (res.error) throw res.error;
-                    console.log(JSON.stringify(res))
-                    const user_id = res[0];
+                if (results.error) throw results.error;
+                sqlite.run("SELECT id as user_id FROM users WHERE username='"+username+"'", function (response) {
+                    if (response.error) throw response.error;
+                    const user_id = response[0];
 
-                    console.log(results[0]);
                     req.login(user_id, function (err) {
                         res.redirect('/');
                     });
@@ -101,8 +154,6 @@ passport.deserializeUser(function (user_id, done) {
 
 function authenticationMiddleware () {
     return (req, res, next) => {
-        console.log(`req.session.passport.user: ${JSON.stringify(req.session.passport.user)}`);
-        console.log(req.isAuthenticated());
         if (req.isAuthenticated()) return next();
         res.redirect('/login')
     }
