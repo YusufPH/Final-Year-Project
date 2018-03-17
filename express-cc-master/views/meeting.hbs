@@ -190,32 +190,13 @@
             "description": document.getElementById('meeting_description').value,
             "location": document.getElementById('meeting_location').value,
             "locked": document.getElementById('privacy').checked,
-            "password": document.getElementById('meeting_password').value
+            "password": document.getElementById('meeting_password').value,
+            "options": options
         };
         xhttp.send(JSON.stringify(params));
-        console.log("Submitted one");
-        console.log(options);
-        var meetingId;
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.responseText) {
-                console.log(this.responseText);
-                meetingId = this.responseText;
-            }
-        };
-        var xhttp2 = new XMLHttpRequest();
-        xhttp2.open("POST", "/addMeetingDates", true);
-        xhttp2.setRequestHeader("Content-type", "application/json");
-        while (!meetingId)
-        {
-
-        }
-        xhttp2.send({"id": meetingId, "options": options});
-        xhttp2.onreadystatechange = function () {
-            if (this.readyState =4 && this.responseText) {
-                if (this.status == 200)
-                {
-                    alert("Your url is " + window.href.address.split("/")[window.href.address.split("/").length - 1] + "/" + this.responseText);
-                }
+                alert("Your url is " + window.location.href.split("/")[window.location.href.split("/").length - 1] + "/" + this.responseText);
             }
         };
     }

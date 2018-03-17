@@ -55,42 +55,40 @@ router.post('/createMeeting', function (req, res, next) {
             console.log(JSON.stringify(results.error));
             res.status(400).end(results.error);
         } else {
-            console.log("No error");
-            res.status(200).end(results);
+            var id = results;
+            req.body.options.forEach(function (option) {
+                cmd = "INSERT INTO MeetingDates (meetingid, date, lowerboundLimit, upperboundLimit, length) VALUES ('"+ id +"', '"+ option.date +"', '"+ option.start_time +"', '"+ option.end_time +"', '"+ option.length +"');";
+                console.log(cmd);
+                sqlite.run(cmd, function (response) {
+                    console.log(JSON.stringify(response));
+                    if (response.error)
+                    {
+                        console.log("Error:");
+                        console.log(JSON.stringify(response.error));
+                        res.status(400).end(response.error);
+                    } else {
+                        var url = parseInt(Math.random().toString().split('.')[1]).toString(26);
+                        cmd = "INSERT INTO urls VALUES('"+id+"','"+url+"');";
+                        sqlite.run(cmd, function (data) {
+                            console.log(JSON.stringify(data));
+                            if (data.error)
+                            {
+                                console.log("Error:");
+                                console.log(JSON.stringify(data.error));
+                                res.status(400).end(data.error);
+                            } else {
+                                res.status(200).end(url);
+                            }
+                        });
+                    }
+                });
+            });
         }
     });
 });
 
 router.post('/addMeetingDates', function (req, res, next) {
     console.log("Updating meeting");
-    var id = req.body.id;
-    var cmd;
-    req.body.options.forEach(function (option) {
-       cmd = "INSERT INTO MeetingDates (meetingid, date, lowerboundLimit, upperboundLimit, length) VALUES ('"+ id +"', '"+ option.date +"', '"+ option.start_time +"', '"+ option.end_time +"', '"+ option.length +"');";
-        console.log(cmd);
-        sqlite.run(cmd, function (results) {
-            console.log(JSON.stringify(results));
-            if (results.error)
-            {
-                console.log("Error:");
-                console.log(JSON.stringify(results.error));
-                res.status(400).end(results.error);
-            }
-        });
-    });
-    var url = parseInt(Math.random().toString().split('.')[1]).toString(26);
-    cmd = "INSERT INTO urls VALUES('"+id+"','"+url+"');";
-    qlite.run(cmd, function (results) {
-        console.log(JSON.stringify(results));
-        if (results.error)
-        {
-            console.log("Error:");
-            console.log(JSON.stringify(results.error));
-            res.status(400).end(results.error);
-        } else {
-            res.status(200).end(url);
-        }
-    });
 });
 
 /* GET Register page. */
