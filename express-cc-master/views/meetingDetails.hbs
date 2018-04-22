@@ -16,7 +16,7 @@
                 <a class="nav-link js-scroll-trigger" href="#optimal">Optimal</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link js-scroll-trigger" href="#add">Add</a>
+                <a id="nav_add" class="nav-link js-scroll-trigger" href="#add">Add</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link js-scroll-trigger" href="#invite">Invite</a>
@@ -227,6 +227,7 @@
             }
             if(response.status == "Closed" ){
                 document.getElementById('add').style.display = 'none';
+                document.getElementById('nav_add').style.display = 'none';
             }
 
             var options = response.options;
@@ -438,15 +439,15 @@
                 document.getElementById('date'+no).style.border = "solid #FF0000";
                 submittable = false;
             }
-            if (!document.getElementById('start_time'+no).value) {
+            if (!document.getElementById('start_time'+no).value ||  (document.getElementById('end_time'+no).value < document.getElementById('start_time'+no).value)) {
                 document.getElementById('start_time'+no).style.border = "solid #FF0000";
                 submittable = false;
             }
-            if (!document.getElementById('end_time'+no).value) {
+            if (!document.getElementById('end_time'+no).value ||  (document.getElementById('end_time'+no).value < document.getElementById('start_time'+no).value)) {
                 document.getElementById('end_time'+no).style.border = "solid #FF0000";
                 submittable = false;
             }
-            if (!document.getElementById('pref_start'+no).value) {
+            if (!document.getElementById('pref_start'+no).value ||  (document.getElementById('pref_start'+no).value > document.getElementById('end_time'+no).value) || (document.getElementById('pref_start'+no).value < document.getElementById('start_time'+no).value) ) {
                 document.getElementById('pref_start'+no).style.border = "solid #FF0000";
                 submittable = false;
             }
@@ -485,7 +486,6 @@
             document.getElementById('start_time'+no).style.border = "none";
             document.getElementById('end_time'+no).style.border = "none";
             document.getElementById('pref_start'+no).style.border = "none";
-                    //"box-shadow: 0 0 3px; margin: 10px";
         }
     }
 

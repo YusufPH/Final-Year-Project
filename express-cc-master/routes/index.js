@@ -52,7 +52,7 @@ router.post('/createMeeting', function (req, res, next) {
     {
         var pass = req.body.password;
     }
-    var cmd = "INSERT INTO MeetingInfo (title, description, location, adminUsername, locked, password, length, status, offStartTime) VALUES ('"+ req.body.title +"', '"+ req.body.description +"', '"+ req.body.location +"', '"+ req.session.passport.user.user_id +"', '"+ req.body.locked +"', '"+ pass +"','"+ req.body.length +"','"+ 'open' +"','"+ '0' +"');";
+    var cmd = "INSERT INTO MeetingInfo (title, description, location, adminUsername, locked, password, length, status, startTime, startDate) VALUES ('"+ req.body.title +"', '"+ req.body.description +"', '"+ req.body.location +"', '"+ req.session.passport.user.user_id +"', '"+ req.body.locked +"', '"+ pass +"','"+ req.body.length +"','"+ 'Open' +"','"+ '0' +"','"+ '0' +"');";
     console.log(cmd);
     sqlite.run(cmd, function (results) {
         console.log(JSON.stringify(results));
