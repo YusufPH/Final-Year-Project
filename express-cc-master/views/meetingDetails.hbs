@@ -178,6 +178,7 @@
                     <input type="text" style="display: inline-block" placeholder="Username" id="invitee_username"><br><br>
                     <button type="button" onclick="invite()" style="display: inline-block" class="btn btn-primary">Invite</button>
                 </div>
+                <p id="newT"></p>
             </section>
 
         </div>
@@ -188,6 +189,7 @@
 <script>
     var dateCounter = 1;
     var dates = [];
+    var durat;
 
     var xhttp1 = new XMLHttpRequest();
     xhttp1.open("POST", "/getMeeting", true);
@@ -215,6 +217,7 @@
             document.getElementById('meeting_location').innerHTML = response.location;
             document.getElementById('meeting_length').innerHTML = response.length;
             document.getElementById('meeting_status').innerHTML = response.status;
+            durat = response.length;
 
             if(response.start_time == 0){
                 document.getElementById('meeting_time').innerHTML = "Undecided";
@@ -435,6 +438,11 @@
         var options = [];
         for (var no = 1; no <= dateCounter; no++)
         {
+            temp = document.getElementById('pref_start'+no).value;
+            document.getElementById('newT').innerHTML = durat;
+            temp = moment(temp, ["HH:mm", moment.ISO_8601]);
+            temp = temp.add(durat, 'hours').format("HH:mm");
+
             if (!document.getElementById('date'+no).value) {
                 document.getElementById('date'+no).style.border = "solid #FF0000";
                 submittable = false;
@@ -443,7 +451,7 @@
                 document.getElementById('start_time'+no).style.border = "solid #FF0000";
                 submittable = false;
             }
-            if (!document.getElementById('end_time'+no).value ||  (document.getElementById('end_time'+no).value < document.getElementById('start_time'+no).value)) {
+            if (!document.getElementById('end_time'+no).value ||  (document.getElementById('end_time'+no).value < document.getElementById('start_time'+no).value) || (document.getElementById('end_time'+no).value < temp)) {
                 document.getElementById('end_time'+no).style.border = "solid #FF0000";
                 submittable = false;
             }

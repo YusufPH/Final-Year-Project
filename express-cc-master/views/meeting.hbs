@@ -113,6 +113,7 @@
                 <div id = "submit" class="container">
                     <button style="margin:0 auto; display:block; display: inline-block" type="button" onClick="submit()" class="btn btn-primary">Submit</button>
                 </div>
+
             </div>
 
         </section>
@@ -215,8 +216,16 @@
         }
 
         var options = [];
+        var temp;
+        var durat;
         for (var no = 1; no <= dateCounter; no++)
         {
+            durat = document.getElementById("length").value;
+            temp = document.getElementById('start_time'+no).value;
+            temp = moment(temp, ["HH:mm", moment.ISO_8601]);
+            temp = temp.add(durat, 'hours').format("HH:mm");
+
+
             if (!document.getElementById('date'+no).value || !(Date.now() < Date.parse(document.getElementById('date'+no).value))) {
                 document.getElementById('date'+no).style.border = "solid #FF0000";
                 submittable = false;
@@ -229,7 +238,7 @@
             } else {
                 document.getElementById('start_time'+no).style.border = "none";
             }
-            if (!document.getElementById('end_time'+no).value || (document.getElementById('end_time'+no).value < document.getElementById('start_time'+no).value)) {
+            if (!document.getElementById('end_time'+no).value || (document.getElementById('end_time'+no).value < document.getElementById('start_time'+no).value) || (document.getElementById('end_time'+no).value < temp)) {
                 document.getElementById('end_time'+no).style.border = "solid #FF0000";
                 submittable = false;
             } else {
